@@ -1,4 +1,4 @@
-from ghlib import Priority_Queue
+from ghlib import *
 
 pq = Priority_Queue()
 pq.push(10)

@@ -75,3 +75,29 @@ class Priority_Queue(object):
         r = self.pq_list.pop()
         sift_down(self.pq_list, 0)
         return r
+
+class Queue(object):
+    '''
+    parameters: <none>
+    purpose: default constructor that creates an empty queue
+    state variables:
+        q_list is a list that represents a queue
+    '''
+    def __init__(self):
+        self.q_list = [] #a list of values of a given type
+
+    '''
+    parameters: val the value being added to the priority queue
+    purpose: adds value to the end of q_list
+    '''
+    def push(self, val):
+        self.q_list.append(val)
+
+    '''
+    parameters: <none>
+    purpose: removes value in first index
+    returns: the popped value r
+    '''
+    def pop(self):
+        r = self.q_list.pop(0)
+        return r
