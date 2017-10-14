@@ -23,13 +23,14 @@ class Process(object):
         #modify
         self.io_burst = self.io_time
         self.current_burst = self.burst_time
+        self.current_num = self.num_bursts
     '''
     parameters: <none>
     purpose: converts a Process object into a string value
     returns: string representation of the Process
     '''
     def __str__(self):
-        return self.id + "|" + str(self.arrival_time) + "|" + str(self.burst_time) + "|" + str(self.num_bursts) + "|" + str(self.io_time)
+        return self.id + "|" + str(self.arrival_time) + "|" + str(self.burst_time) + "|" + str(self.current_num) + "|" + str(self.io_time)
 
     def __lt__(self, other):
         return False
@@ -46,8 +47,8 @@ class Process(object):
     returns: boolean (whether or not the process is completely finished)
     '''
     def restart(self):
-        self.num_bursts -= 1
-        if self.num_bursts == 0:
+        self.current_num -= 1
+        if self.current_num == 0:
             return False
         self.current_burst = self.burst_time
         self.io_burst = self.io_time

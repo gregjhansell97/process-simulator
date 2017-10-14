@@ -8,6 +8,17 @@ class Queue(object):
     def __init__(self):
         self.q_list = [] #a list of values of a given type
 
+    def __str__(self):
+        r = "[Q "
+        count = 0
+        for i in self.q_list:
+            r = r + i.id + " "*(count < len(self.q_list) - 1)
+            count += 0
+        if self.is_empty():
+            r = r + "<empty>]"
+        else:
+            r = r + "]"
+        return r
     '''
     parameters: val the value being added to the priority queue
     purpose: adds value to the end of q_list
