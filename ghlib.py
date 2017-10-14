@@ -1,3 +1,37 @@
+class Queue(object):
+    '''
+    parameters: <none>
+    purpose: default constructor that creates an empty queue
+    state variables:
+        q_list is a list that represents a queue
+    '''
+    def __init__(self):
+        self.q_list = [] #a list of values of a given type
+
+    '''
+    parameters: val the value being added to the priority queue
+    purpose: adds value to the end of q_list
+    '''
+    def push(self, val):
+        self.q_list.append(val)
+
+    '''
+    parameters: <node>
+    returns: returns true if list has no values in it, false otherwise
+    '''
+    def is_empty(self):
+        return len(self.q_list) == 0
+
+    '''
+    parameters: <none>
+    purpose: removes value in first index
+    returns: the popped value r
+    '''
+    def pop(self):
+        r = self.q_list.pop(0)
+        return r
+
+
 '''
 parameters: l <list that represents a priority queue>, i <index>
 purpose: moves the index further up the list until it's no longer
@@ -45,24 +79,31 @@ returns: boolean verifying whether or not its an index
 def is_index(l, i):
     return i >= 0 and i < len(l)
 
-class Priority_Queue(object):
+class Priority_Queue(Queue):
     '''
     parameters: <none>
     purpose: default constructor that creates an empty priority queue
     state variables:
-        pq_list is a list that represents a priority queue
+        q_list is a list that represents a priority queue
     '''
     def __init__(self):
-        self.pq_list = [] #a list of values of a given type
+        Queue.init(self)
 
     '''
     parameters: val <the value being added to the priority queue
-    purpose: adds value to the end of pq_list and the function
+    purpose: adds value to the end of q_list and the function
         bubble_up then moves it to the appropriate index
     '''
     def push(self, val):
-        self.pq_list.append(val)
-        bubble_up(self.pq_list, len(self.pq_list) - 1)
+        self.q_list.append(val)
+        bubble_up(self.q_list, len(self.q_list) - 1)
+
+    '''
+    parameters: <node>
+    returns: true if list has no values in it, false otherwise
+    '''
+    def is_empty(self):
+        return len(self.q_list) == 0
 
     '''
     parameters: <none>
@@ -71,33 +112,7 @@ class Priority_Queue(object):
     returns: the popped value r
     '''
     def pop(self):
-        swap(self.pq_list, 0, len(self.pq_list) - 1)
-        r = self.pq_list.pop()
-        sift_down(self.pq_list, 0)
-        return r
-
-class Queue(object):
-    '''
-    parameters: <none>
-    purpose: default constructor that creates an empty queue
-    state variables:
-        q_list is a list that represents a queue
-    '''
-    def __init__(self):
-        self.q_list = [] #a list of values of a given type
-
-    '''
-    parameters: val the value being added to the priority queue
-    purpose: adds value to the end of q_list
-    '''
-    def push(self, val):
-        self.q_list.append(val)
-
-    '''
-    parameters: <none>
-    purpose: removes value in first index
-    returns: the popped value r
-    '''
-    def pop(self):
-        r = self.q_list.pop(0)
+        swap(self.q_list, 0, len(self.q_list) - 1)
+        r = self.q_list.pop()
+        sift_down(self.q_list, 0)
         return r
