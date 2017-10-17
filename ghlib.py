@@ -13,7 +13,7 @@ class Queue(object):
         count = 0
         for i in self.q_list:
             r = r + i.id + " "*(count < len(self.q_list) - 1)
-            count += 0
+            count += 1
         if self.is_empty():
             r = r + "<empty>]"
         else:
