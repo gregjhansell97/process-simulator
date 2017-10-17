@@ -33,30 +33,19 @@ class Process(object):
         return self.id + "|" + str(self.arrival_time) + "|" + str(self.burst_time) + "|" + str(self.current_num) + "|" + str(self.io_time)
 
     def __lt__(self, other):
-        if (self.current_burst < other.current_burst):
-            return True
-        return False
+        return (self.current_burst < other.current_burst)
 
     def __gt__(self, other):
-        if (self.current_burst > other.current_burst):
-            return True
-        return False
+        return (self.current_burst > other.current_burst)
 
     def __eq__(self, other):
-        if (self.current_burst == other.current_burst):
-            return True
-        return False
+        return (self.current_burst == other.current_burst)
 
     def __le__(self, other):
-        if (self.current_burst <= other.current_burst):
-            return True
-        return False
+        return (self.current_burst <= other.current_burst)
 
     def __ge__(self,other):
-        if (self.current_burst >= other.current_burst):
-            return True
-        return False
-
+        return (self.current_burst >= other.current_burst)
     '''
     parameters: <none>
     purpose: called after it finishes current bursts

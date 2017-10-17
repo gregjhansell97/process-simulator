@@ -54,7 +54,9 @@ def bubble_up(l, i):
     # print("parent: ", parent)
     # print("l: ", l)
     # print("i: ", i)
-    if(l[parent] < l[i]):
+    #print("l[parent]: ", l[parent].current_burst)
+    #print("l[i]: ", l[i].current_burst)
+    if(l[parent] > l[i]):
         swap(l, parent, i)
         bubble_up(l, i/2)
 
@@ -67,14 +69,14 @@ def sift_down(l, i):
     left_child = 2*i + 1
     right_child = 2*i
     if(is_index(l, left_child)):
-        if(l[left_child] > l[i] and l[left_child] >= l[right_child]):
+        if(l[left_child] < l[i] and l[left_child] <= l[right_child]):
             swap(l, left_child, i)
             sift_down(l, left_child)
-        elif(l[right_child] > l[i] and l[right_child] >= l[left_child]):
+        elif(l[right_child] < l[i] and l[right_child] <= l[left_child]):
             swap(l, right_child, i)
             sift_down(l, right_child)
     elif(is_index(l, right_child)):
-        if(l[right_child] > l[i]):
+        if(l[right_child] < l[i]):
             swap(l, right_child, i)
 
 '''
