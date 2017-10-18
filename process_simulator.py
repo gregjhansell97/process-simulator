@@ -3,6 +3,8 @@ from process import *
 import sys
 import copy
 
+t_slice = 70
+
 def done(process_list):
     for p in process_list:
         if p.current_num > 0: return False
@@ -40,6 +42,12 @@ def print_preempt_io(clk, p, rp, q):
 
 def print_started_using_cpu_preempt(clk, p, q):
     print("time " + str(clk) + "ms: Process " + p.id + " started using the CPU with " + str(p.current_burst) + "ms remaining" + str(q))
+
+def print_tslice_expire_add(clk, p, q):
+    print("time " + str(clk) + "ms: Time slice expired; process " + str(p.id) + " preempted with " + str(p.current_burst) + "ms to go" + str(q))
+
+def print_tslice_expire_noadd(clk, p, q):
+    print("time " + str(clk) + "ms: Time slice expired; no preemption because ready queue is empty" + str(q))
 
 def FCFS(process_list):
     pli = 0 #process list index
@@ -190,6 +198,7 @@ def RR(process_list):
     blocked = [] #list of processes that are blcoking
     ready_q = Queue() #queue of processes in the ready_q
     running_process = None #the current process that is running
+    timeslice_counter = 0 #keeps track of current CPU time
     algo = "RR" #which algorithm is being used
 
     print_simulator_start(clock, algo, ready_q)
@@ -207,6 +216,7 @@ def RR(process_list):
                 wait = 3
                 running_process = ready_q.pop()
                 print_started_using_cpu(clock + 4, running_process, ready_q)
+                timeslice_counter = 0
         else: #there is a running_process
             if(running_process.current_burst <= 0): #running process has finished bursts
                 if running_process.restart():
@@ -216,12 +226,26 @@ def RR(process_list):
                     wait = 3
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
+                    timeslice_counter = 0
                 else:
                     print_process_terminated(clock, running_process, ready_q)
                     wait = 3
                     #print that the process is terminated
                 running_process = None #making sure another process can become running_process
+            elif(timeslice_counter >= t_slice):
+                if (ready_q.is_empty()): #if the queue is empty, just keep running the process
+                    print_tslice_expire_noadd(clock, running_process, ready_q)
+                    running_process.current_burst -= 1
+                    timeslice_counter = 1
+                else:
+                    print_tslice_expire_add(clock, running_process, ready_q)
+                    ready_q.push(running_process)
+                    wait = 3
+                    running_process = None
+                    timeslice_counter = 0
+                    
             else: #run process normally by decrementing current_burst
+                timeslice_counter += 1
                 running_process.current_burst -= 1
 
         #handle blocked list
