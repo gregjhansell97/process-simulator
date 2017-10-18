@@ -49,13 +49,19 @@ purpose: moves the index further up the list until it's no longer
     larger than it's parent
 '''
 def bubble_up(l, i):
-    parent = i/2
-    if(l[parent] < l[i]):
+    parent = int(i/2)
+    i = int(i)
+    # print("parent: ", parent)
+    # print("l: ", l)
+    # print("i: ", i)
+    #print("l[parent]: ", l[parent].current_burst)
+    #print("l[i]: ", l[i].current_burst)
+    if(l[parent] > l[i]):
         swap(l, parent, i)
         bubble_up(l, i/2)
 
 '''
-parameters: l <list that represesnts a priority queue>, i <index>
+parameters: l <list that represents a priority queue>, i <index>
 purpose: moves the index down in the list until it is less than
     its parents but larger than its children
 '''
@@ -63,14 +69,14 @@ def sift_down(l, i):
     left_child = 2*i + 1
     right_child = 2*i
     if(is_index(l, left_child)):
-        if(l[left_child] > l[i] and l[left_child] >= l[right_child]):
+        if(l[left_child] < l[i] and l[left_child] <= l[right_child]):
             swap(l, left_child, i)
             sift_down(l, left_child)
-        elif(l[right_child] > l[i] and l[right_child] >= l[left_child]):
+        elif(l[right_child] < l[i] and l[right_child] <= l[left_child]):
             swap(l, right_child, i)
             sift_down(l, right_child)
     elif(is_index(l, right_child)):
-        if(l[right_child] > l[i]):
+        if(l[right_child] < l[i]):
             swap(l, right_child, i)
 
 '''
@@ -98,7 +104,7 @@ class Priority_Queue(Queue):
         q_list is a list that represents a priority queue
     '''
     def __init__(self):
-        Queue.init(self)
+        Queue.__init__(self)
 
     '''
     parameters: val <the value being added to the priority queue
