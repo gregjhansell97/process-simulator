@@ -1,5 +1,6 @@
 from ghlib import *
 from process import *
+from info import *
 import sys
 import copy
 
@@ -69,6 +70,7 @@ def FCFS(process_list):
             pli += 1
 
         if(wait > 0):
+            FCFSinfo.avg_turnaround_time += 1
             wait -= 1
         elif running_process is None: #need to set a running process
             if not ready_q.is_empty(): #if there are processes in the ready Q
@@ -92,8 +94,12 @@ def FCFS(process_list):
                     #print("time " + str(clock) + "ms: Process " + str(running_process.id) + " terminated " + str(ready_q))
                     wait = 3
                     #print that the process is terminated
+                FCFSinfo.num_contextswitches += 1
                 running_process = None #making sure another process can become running_process
             else: #run process normally by decrementing current_burst
+                FCFSinfo.avg_burst_time += 1
+                FCFSinfo.avg_wait_time += int(ready_q.length())
+                FCFSinfo.avg_turnaround_time += 1
                 running_process.current_burst -= 1
 
         #handle blocked list
@@ -264,7 +270,7 @@ def RR(process_list):
     clock += wait
     print_simulator_finish(clock, algo, ready_q)
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         #definetly not the best way to error handle
@@ -281,8 +287,18 @@ if __name__ == "__main__":
         process_listSRT.append(Process(line))
         process_listRR.append(Process(line))
 
+    numProcesses = len(process_listFCFS)
+    FCFSinfo = Info("FCFS", numProcesses)
+    SRTinfo = Info("SRT", numProcesses)
+    RRinfo = Info("RR", numProcesses)
+
     FCFS(process_listFCFS)
     print()
     SRT(process_listSRT)
     print()
     RR(process_listRR)
+    
+    print(str(FCFSinfo))
+    f2 = open("output.txt", 'w')
+    f2.write("ayyy")
+    f2.close()

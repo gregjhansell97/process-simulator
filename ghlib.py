@@ -33,6 +33,9 @@ class Queue(object):
     def is_empty(self):
         return len(self.q_list) == 0
 
+    def length(self):
+        return len(self.q_list)
+
     '''
     parameters: <none>
     purpose: removes value in first index
