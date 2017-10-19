@@ -30,10 +30,16 @@ def print_added_to_ready_queue(clk, p, q):
     print("time " + str(clk) + "ms: Process " + p.id + " arrived and added to ready queue " + str(q))
 
 def print_started_using_cpu(clk, p, q):
-    print("time " + str(clk) + "ms: Process " + p.id + " started using the CPU " + str(q))
+    if (p.current_burst == p.burst_time):
+        print("time " + str(clk) + "ms: Process " + p.id + " started using the CPU " + str(q))
+    else:
+        print("time " + str(clk) + "ms: Process " + p.id + " started using the CPU with " + str(p.current_burst) + "ms remaining " + str(q))
 
 def print_cpu_burst_completion(clk, p, q):
-    print("time " + str(clk) + "ms: Process " + str(p.id) + " completed a CPU burst; " + str(p.current_num) + " bursts to go " + str(q))
+    if (p.current_num == 1):
+        print("time " + str(clk) + "ms: Process " + str(p.id) + " completed a CPU burst; " + str(p.current_num) + " burst to go " + str(q))
+    else:
+        print("time " + str(clk) + "ms: Process " + str(p.id) + " completed a CPU burst; " + str(p.current_num) + " bursts to go " + str(q))
 
 def print_switching_out(clk, p, q):
     print("time " + str(clk) + "ms: Process " + str(p.id) + " switching out of CPU; will block on I/O until time " + str(clk + p.io_burst + 4) + "ms " + str(q))
@@ -54,13 +60,13 @@ def print_preempt_io(clk, p, rp, q):
     print("time " + str(clk) + "ms: Process " + str(p.id) + " completed I/O and will preempt " +str(rp.id) + " " + str(q))
 
 def print_started_using_cpu_preempt(clk, p, q):
-    print("time " + str(clk) + "ms: Process " + p.id + " started using the CPU with " + str(p.current_burst) + "ms remaining" + str(q))
+    print("time " + str(clk) + "ms: Process " + p.id + " started using the CPU with " + str(p.current_burst) + "ms remaining " + str(q))
 
 def print_tslice_expire_add(clk, p, q):
-    print("time " + str(clk) + "ms: Time slice expired; process " + str(p.id) + " preempted with " + str(p.current_burst) + "ms to go" + str(q))
+    print("time " + str(clk) + "ms: Time slice expired; process " + str(p.id) + " preempted with " + str(p.current_burst) + "ms to go " + str(q))
 
 def print_tslice_expire_noadd(clk, p, q):
-    print("time " + str(clk) + "ms: Time slice expired; no preemption because ready queue is empty" + str(q))
+    print("time " + str(clk) + "ms: Time slice expired; no preemption because ready queue is empty " + str(q))
 
 def FCFS(process_list):
     pli = 0 #process list index
@@ -204,7 +210,6 @@ def SRT(process_list):
         while i < len(blocked): #looping through blocks
             if blocked[i].io_burst <= 0: #if I/O is done
                 change_process = blocked.pop(i)
-                pq.push(change_process)
                 if (running_process is not None):
                     if (change_process.current_burst < running_process.current_burst):
                         print_preempt_io(clock + 1, change_process, running_process, pq)
@@ -218,6 +223,7 @@ def SRT(process_list):
                         print_completed_io(clock + 1, change_process, pq)
                 else:
                     print_completed_io(clock + 1, change_process, pq)
+                pq.push(change_process)
                 continue
             else: #if I/O burst needs more time
                 blocked[i].io_burst -= 1
@@ -250,6 +256,7 @@ def RR(process_list):
         elif running_process is None: #need to set a running process
             if not ready_q.is_empty(): #if there are processes in the ready Q
                 wait = 3
+                RRinfo.turnaround_time += 4
                 running_process = ready_q.pop()
                 print_started_using_cpu(clock + 4, running_process, ready_q)
                 timeslice_counter = 0
@@ -260,37 +267,49 @@ def RR(process_list):
                     print_cpu_burst_completion(clock, running_process, ready_q)
                     print_switching_out(clock, running_process, ready_q)
                     wait = 3
+                    RRinfo.turnaround_time += 4
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
                     timeslice_counter = 0
                 else:
                     print_process_terminated(clock, running_process, ready_q)
                     wait = 3
+                    RRinfo.turnaround_time += 4
                     #print that the process is terminated
+                RRinfo.num_contextswitches += 1
                 running_process = None #making sure another process can become running_process
             elif(timeslice_counter >= t_slice):
                 if (ready_q.is_empty()): #if the queue is empty, just keep running the process
                     print_tslice_expire_noadd(clock, running_process, ready_q)
+                    RRinfo.burst_time += 1
+                    RRinfo.turnaround_time += 1
                     running_process.current_burst -= 1
                     timeslice_counter = 1
                 else:
                     print_tslice_expire_add(clock, running_process, ready_q)
+                    RRinfo.num_preemptions += 1
+                    RRinfo.num_contextswitches += 1
+                    RRinfo.wait_time -= 4
                     ready_q.push(running_process)
                     wait = 3
                     running_process = None
                     timeslice_counter = 0
-                    
             else: #run process normally by decrementing current_burst
+                RRinfo.burst_time += 1 #count the running_process
+                RRinfo.turnaround_time += 1 #count for running process
                 timeslice_counter += 1
                 running_process.current_burst -= 1
+
+        RRinfo.wait_time += int(ready_q.length())
+        RRinfo.turnaround_time += int(ready_q.length()) #count for all processes in queue
 
         #handle blocked list
         i = 0
         while i < len(blocked): #looping through blocks
             if blocked[i].io_burst <= 0: #if I/O is done
                 change_process = blocked.pop(i)
-                ready_q.push(change_process)
                 print_completed_io(clock + 1, change_process, ready_q)
+                ready_q.push(change_process)
                 continue
             else: #if I/O burst needs more time
                 blocked[i].io_burst -= 1
@@ -334,11 +353,12 @@ if __name__ == "__main__":
     print()
     RR(process_listRR)
     
-    #adding the info to the output text file
-    print(str(FCFSinfo))
-    print(str(SRTinfo))
+    # #adding the info to the output text file
+    # print(str(FCFSinfo))
+    # print(str(SRTinfo))
+    # print(str(RRinfo))
     f2 = open(sys.argv[2], 'w')
     f2.write(str(FCFSinfo))
-    f2.write('\n')
     f2.write(str(SRTinfo))
+    f2.write(str(RRinfo))
     f2.close()
