@@ -11,6 +11,12 @@ def done(process_list):
         if p.current_num > 0: return False
     return True
 
+def getTotalNum(process_list):
+    totalNum = 0
+    for p in process_list:
+        totalNum += p.num_bursts
+    return totalNum
+
 def print_simulator_start(clk, algo, q):
     print("time " + str(clk) + "ms: Simulator started for " + algo + " " + str(q))
 
@@ -60,48 +66,48 @@ def FCFS(process_list):
     algo = "FCFS" #which algorithm is being used
 
     print_simulator_start(clock, algo, ready_q)
-    #print("time " + str(clock) + "ms: Simulator started for FCFS " + str(ready_q))
     while not done(process_list):
+
         #process arrive and are added to the queue
         while pli < len(process_list) and process_list[pli].arrival_time == clock:
             ready_q.push(process_list[pli])
             print_added_to_ready_queue(clock, process_list[pli], ready_q)
-            #print("time " + str(clock) + "ms: Process " + process_list[pli].id + " arrived and added to ready queue " + str(ready_q))
             pli += 1
 
         if(wait > 0):
-            FCFSinfo.avg_turnaround_time += 1
             wait -= 1
         elif running_process is None: #need to set a running process
             if not ready_q.is_empty(): #if there are processes in the ready Q
                 wait = 3
+                FCFSinfo.avg_turnaround_time += 4
                 running_process = ready_q.pop()
                 print_started_using_cpu(clock + 4, running_process, ready_q)
-                #print("time " + str(clock + 4) + "ms: Process " + running_process.id + " started using the CPU " + str(ready_q))
         else: #there is a running_process
             if(running_process.current_burst <= 0): #running process has finished bursts
                 if running_process.restart():
                     #print that the process is blocking I/O
                     print_cpu_burst_completion(clock, running_process, ready_q)
-                    #print("time " + str(clock) + "ms: Process " + str(running_process.id) + " completed a CPU burst; " + str(running_process.current_num) + " bursts to go " + str(ready_q))
                     print_switching_out(clock, running_process, ready_q)
-                    #print("time " + str(clock) + "ms: Process " + str(running_process.id) + " switching out of CPU; will block on I/O until time " + str(clock + running_process.io_burst + 4) + " " + str(ready_q))
                     wait = 3
+                    FCFSinfo.avg_turnaround_time += 4
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
                 else:
                     print_process_terminated(clock, running_process, ready_q)
-                    #print("time " + str(clock) + "ms: Process " + str(running_process.id) + " terminated " + str(ready_q))
                     wait = 3
+                    FCFSinfo.avg_turnaround_time += 4
                     #print that the process is terminated
                 FCFSinfo.num_contextswitches += 1
                 running_process = None #making sure another process can become running_process
             else: #run process normally by decrementing current_burst
-                FCFSinfo.avg_burst_time += 1
-                FCFSinfo.avg_wait_time += int(ready_q.length())
-                FCFSinfo.avg_turnaround_time += 1
+                FCFSinfo.avg_burst_time += 1 #count the running_process
+                FCFSinfo.avg_turnaround_time += 1 #count for running process
                 running_process.current_burst -= 1
 
+        FCFSinfo.avg_wait_time += int(ready_q.length())
+        FCFSinfo.avg_turnaround_time += int(ready_q.length()) #count for all processes in queue
+        
+        ##CYCLE CONSIDERED DONE HERE##
         #handle blocked list
         i = 0
         while i < len(blocked): #looping through blocks
@@ -109,7 +115,6 @@ def FCFS(process_list):
                 change_process = blocked.pop(i)
                 ready_q.push(change_process)
                 print_completed_io(clock + 1, change_process, ready_q)
-                #print("time " + str(clock + 1) + "ms: Process " + str(change_process.id) + " completed I/O; added to ready queue " + str(ready_q))
                 continue
             else: #if I/O burst needs more time
                 blocked[i].io_burst -= 1
@@ -138,6 +143,9 @@ def SRT(process_list):
                 if (process_list[pli].current_burst < running_process.current_burst):
                     print_preemption(clock, process_list[pli], running_process, pq)
                     pq.push(running_process)
+                    SRTinfo.num_preemptions += 1
+                    SRTinfo.num_contextswitches += 1
+                    SRTinfo.avg_wait_time -= 4
                     wait = 4
                     running_process = None
                 else:
@@ -151,6 +159,7 @@ def SRT(process_list):
         elif running_process is None: #need to set a running process
             if not pq.is_empty(): #if there are processes in the ready Q
                 wait = 3
+                SRTinfo.avg_turnaround_time += 4
                 running_process = pq.pop()
                 if (running_process.current_burst < running_process.burst_time):
                     print_started_using_cpu_preempt(clock + 4, running_process, pq)
@@ -161,16 +170,28 @@ def SRT(process_list):
                 if running_process.restart():
                     print_cpu_burst_completion(clock, running_process, pq)
                     print_switching_out(clock, running_process, pq)
+                    SRTinfo.avg_turnaround_time += 4
                     wait = 3
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
                 else:
                     print_process_terminated(clock, running_process, pq)
+                    SRTinfo.avg_turnaround_time += 4
                     wait = 3
                     #print that the process is terminated
+                SRTinfo.num_contextswitches += 1
                 running_process = None #making sure another process can become running_process
             else: #run process normally by decrementing current_burst
+                SRTinfo.avg_burst_time += 1 #count the running_process
+                SRTinfo.avg_turnaround_time += 1 #count for running process
                 running_process.current_burst -= 1
+
+        #CYCLE CONSIDERED DONE HERE#
+
+        SRTinfo.avg_wait_time += int(pq.length())
+        SRTinfo.avg_turnaround_time += int(pq.length()) #count for all processes in queue
+        
+        #COUNT DONE HERE#
 
         #handle blocked list
         i = 0
@@ -182,6 +203,9 @@ def SRT(process_list):
                     if (change_process.current_burst < running_process.current_burst):
                         print_preempt_io(clock + 1, change_process, running_process, pq)
                         pq.push(running_process)
+                        SRTinfo.avg_wait_time -= 4
+                        SRTinfo.num_preemptions += 1
+                        SRTinfo.num_contextswitches += 1
                         wait = 4
                         running_process = None
                     else:
@@ -287,7 +311,7 @@ if __name__ == "__main__":
         process_listSRT.append(Process(line))
         process_listRR.append(Process(line))
 
-    numProcesses = len(process_listFCFS)
+    numProcesses = getTotalNum(process_listRR)
     FCFSinfo = Info("FCFS", numProcesses)
     SRTinfo = Info("SRT", numProcesses)
     RRinfo = Info("RR", numProcesses)
@@ -299,6 +323,7 @@ if __name__ == "__main__":
     RR(process_listRR)
     
     print(str(FCFSinfo))
+    print(str(SRTinfo))
     f2 = open("output.txt", 'w')
     f2.write("ayyy")
     f2.close()
