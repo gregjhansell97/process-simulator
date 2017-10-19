@@ -1,3 +1,9 @@
+'''
+Shane O'Brien && Greg Hansell
+Operating Systems - CSCI 4210
+Project One
+'''
+
 from ghlib import *
 from process import *
 from info import *
@@ -79,7 +85,7 @@ def FCFS(process_list):
         elif running_process is None: #need to set a running process
             if not ready_q.is_empty(): #if there are processes in the ready Q
                 wait = 3
-                FCFSinfo.avg_turnaround_time += 4
+                FCFSinfo.turnaround_time += 4
                 running_process = ready_q.pop()
                 print_started_using_cpu(clock + 4, running_process, ready_q)
         else: #there is a running_process
@@ -89,23 +95,23 @@ def FCFS(process_list):
                     print_cpu_burst_completion(clock, running_process, ready_q)
                     print_switching_out(clock, running_process, ready_q)
                     wait = 3
-                    FCFSinfo.avg_turnaround_time += 4
+                    FCFSinfo.turnaround_time += 4
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
                 else:
                     print_process_terminated(clock, running_process, ready_q)
                     wait = 3
-                    FCFSinfo.avg_turnaround_time += 4
+                    FCFSinfo.turnaround_time += 4
                     #print that the process is terminated
                 FCFSinfo.num_contextswitches += 1
                 running_process = None #making sure another process can become running_process
             else: #run process normally by decrementing current_burst
-                FCFSinfo.avg_burst_time += 1 #count the running_process
-                FCFSinfo.avg_turnaround_time += 1 #count for running process
+                FCFSinfo.burst_time += 1 #count the running_process
+                FCFSinfo.turnaround_time += 1 #count for running process
                 running_process.current_burst -= 1
 
-        FCFSinfo.avg_wait_time += int(ready_q.length())
-        FCFSinfo.avg_turnaround_time += int(ready_q.length()) #count for all processes in queue
+        FCFSinfo.wait_time += int(ready_q.length()) #count for all processes in queue
+        FCFSinfo.turnaround_time += int(ready_q.length()) #count for all processes in queue
         
         ##CYCLE CONSIDERED DONE HERE##
         #handle blocked list
@@ -145,7 +151,7 @@ def SRT(process_list):
                     pq.push(running_process)
                     SRTinfo.num_preemptions += 1
                     SRTinfo.num_contextswitches += 1
-                    SRTinfo.avg_wait_time -= 4
+                    SRTinfo.wait_time -= 8 #because you are putting two on pq and making it wait for 4 ms
                     wait = 4
                     running_process = None
                 else:
@@ -159,7 +165,7 @@ def SRT(process_list):
         elif running_process is None: #need to set a running process
             if not pq.is_empty(): #if there are processes in the ready Q
                 wait = 3
-                SRTinfo.avg_turnaround_time += 4
+                SRTinfo.turnaround_time += 4
                 running_process = pq.pop()
                 if (running_process.current_burst < running_process.burst_time):
                     print_started_using_cpu_preempt(clock + 4, running_process, pq)
@@ -170,26 +176,26 @@ def SRT(process_list):
                 if running_process.restart():
                     print_cpu_burst_completion(clock, running_process, pq)
                     print_switching_out(clock, running_process, pq)
-                    SRTinfo.avg_turnaround_time += 4
+                    SRTinfo.turnaround_time += 4
                     wait = 3
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
                 else:
                     print_process_terminated(clock, running_process, pq)
-                    SRTinfo.avg_turnaround_time += 4
+                    SRTinfo.turnaround_time += 4
                     wait = 3
                     #print that the process is terminated
                 SRTinfo.num_contextswitches += 1
                 running_process = None #making sure another process can become running_process
             else: #run process normally by decrementing current_burst
-                SRTinfo.avg_burst_time += 1 #count the running_process
-                SRTinfo.avg_turnaround_time += 1 #count for running process
+                SRTinfo.burst_time += 1 #count the running_process
+                SRTinfo.turnaround_time += 1 #count for running process
                 running_process.current_burst -= 1
 
         #CYCLE CONSIDERED DONE HERE#
 
-        SRTinfo.avg_wait_time += int(pq.length())
-        SRTinfo.avg_turnaround_time += int(pq.length()) #count for all processes in queue
+        SRTinfo.wait_time += int(pq.length())
+        SRTinfo.turnaround_time += int(pq.length()) #count for all processes in queue
         
         #COUNT DONE HERE#
 
@@ -203,7 +209,7 @@ def SRT(process_list):
                     if (change_process.current_burst < running_process.current_burst):
                         print_preempt_io(clock + 1, change_process, running_process, pq)
                         pq.push(running_process)
-                        SRTinfo.avg_wait_time -= 4
+                        SRTinfo.wait_time -= 8 #because you are putting two on pq and making it wait for 4 ms
                         SRTinfo.num_preemptions += 1
                         SRTinfo.num_contextswitches += 1
                         wait = 4
@@ -296,9 +302,13 @@ def RR(process_list):
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         #definetly not the best way to error handle
-        print("ERROR takes in only two arguments")
+        print("ERROR: Invalid arguments")
+        print("USAGE: ./a.out <input-file> <stats-output-file>")
+        sys.exit(1)
+    if (sys.argv[1][-4:] != ".txt"):
+        print("ERROR: Invalid input file format")
         sys.exit(1)
 
     f = open(sys.argv[1])
@@ -306,24 +316,29 @@ if __name__ == "__main__":
     process_listSRT = []
     process_listRR = []
     for line in f:
-        if len(line) == 0 or line[0] == "#": continue
+        if len(line) == 0 or line[0] == "#" or line[0] == '\n': continue
         process_listFCFS.append(Process(line))
         process_listSRT.append(Process(line))
         process_listRR.append(Process(line))
 
+    #making the info objects
     numProcesses = getTotalNum(process_listRR)
     FCFSinfo = Info("FCFS", numProcesses)
     SRTinfo = Info("SRT", numProcesses)
     RRinfo = Info("RR", numProcesses)
 
+    #running the process simulations
     FCFS(process_listFCFS)
     print()
     SRT(process_listSRT)
     print()
     RR(process_listRR)
     
+    #adding the info to the output text file
     print(str(FCFSinfo))
     print(str(SRTinfo))
-    f2 = open("output.txt", 'w')
-    f2.write("ayyy")
+    f2 = open(sys.argv[2], 'w')
+    f2.write(str(FCFSinfo))
+    f2.write('\n')
+    f2.write(str(SRTinfo))
     f2.close()
