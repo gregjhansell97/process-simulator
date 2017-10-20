@@ -75,6 +75,7 @@ def FCFS(process_list):
     blocked = [] #list of processes that are blcoking
     ready_q = Queue() #queue of processes in the ready_q
     running_process = None #the current process that is running
+    addtocpu = False
     algo = "FCFS" #which algorithm is being used
 
     print_simulator_start(clock, algo, ready_q)
@@ -86,6 +87,10 @@ def FCFS(process_list):
             print_added_to_ready_queue(clock, process_list[pli], ready_q)
             pli += 1
 
+        if (wait == 0 and addtocpu == True):
+            print_started_using_cpu(clock, running_process, ready_q)
+            addtocpu = False
+
         if(wait > 0):
             wait -= 1
         elif running_process is None: #need to set a running process
@@ -93,7 +98,8 @@ def FCFS(process_list):
                 wait = 3
                 FCFSinfo.turnaround_time += 4
                 running_process = ready_q.pop()
-                print_started_using_cpu(clock + 4, running_process, ready_q)
+                addtocpu = True
+                #print_started_using_cpu(clock + 4, running_process, ready_q)
         else: #there is a running_process
             if(running_process.current_burst <= 0): #running process has finished bursts
                 if running_process.restart():
@@ -118,7 +124,7 @@ def FCFS(process_list):
 
         FCFSinfo.wait_time += int(ready_q.length()) #count for all processes in queue
         FCFSinfo.turnaround_time += int(ready_q.length()) #count for all processes in queue
-        
+
         ##CYCLE CONSIDERED DONE HERE##
         #handle blocked list
         i = 0
@@ -134,7 +140,7 @@ def FCFS(process_list):
         clock += 1
 
     clock += wait
-    print_simulator_finish(clock, algo, ready_q)    
+    print_simulator_finish(clock, algo, ready_q)
 
 def SRT(process_list):
     pli = 0 #process list index
@@ -143,6 +149,7 @@ def SRT(process_list):
     blocked = [] #list of processes that are blcoking
     pq = Priority_Queue()
     running_process = None #the current process that is running
+    addtocpu = False
     algo = "SRT" #which algorithm is being used
 
     print_simulator_start(clock, algo, pq)
@@ -166,6 +173,13 @@ def SRT(process_list):
                 print_added_to_ready_queue(clock, process_list[pli], pq)
             pli += 1
 
+        if (wait == 0 and addtocpu == True):
+            if (running_process.current_burst < running_process.burst_time):
+                print_started_using_cpu_preempt(clock, running_process, pq)
+            else:
+                print_started_using_cpu(clock , running_process, pq)
+            addtocpu = False
+
         if(wait > 0):
             wait -= 1
         elif running_process is None: #need to set a running process
@@ -173,10 +187,7 @@ def SRT(process_list):
                 wait = 3
                 SRTinfo.turnaround_time += 4
                 running_process = pq.pop()
-                if (running_process.current_burst < running_process.burst_time):
-                    print_started_using_cpu_preempt(clock + 4, running_process, pq)
-                else:
-                    print_started_using_cpu(clock + 4, running_process, pq)
+                addtocpu = True
         else: #there is a running_process
             if(running_process.current_burst <= 0): #running process has finished bursts
                 if running_process.restart():
@@ -202,7 +213,7 @@ def SRT(process_list):
 
         SRTinfo.wait_time += int(pq.length())
         SRTinfo.turnaround_time += int(pq.length()) #count for all processes in queue
-        
+
         #COUNT DONE HERE#
 
         #handle blocked list
@@ -219,11 +230,14 @@ def SRT(process_list):
                         SRTinfo.num_contextswitches += 1
                         wait = 4
                         running_process = None
+                        pq.push(change_process)
                     else:
+                        pq.push(change_process)
                         print_completed_io(clock + 1, change_process, pq)
+
                 else:
+                    pq.push(change_process)
                     print_completed_io(clock + 1, change_process, pq)
-                pq.push(change_process)
                 continue
             else: #if I/O burst needs more time
                 blocked[i].io_burst -= 1
@@ -237,10 +251,12 @@ def RR(process_list):
     pli = 0 #process list index
     clock = 0 #clock
     wait = 0 #used to pause running_process for wait + 1 time
+    add_to_blocked = None
     blocked = [] #list of processes that are blcoking
     ready_q = Queue() #queue of processes in the ready_q
     running_process = None #the current process that is running
     timeslice_counter = 0 #keeps track of current CPU time
+    addtocpu = False
     algo = "RR" #which algorithm is being used
 
     print_simulator_start(clock, algo, ready_q)
@@ -251,14 +267,19 @@ def RR(process_list):
             print_added_to_ready_queue(clock, process_list[pli], ready_q)
             pli += 1
 
+        if (wait == 0 and addtocpu == True):
+            print_started_using_cpu(clock, running_process, ready_q)
+            addtocpu = False
+
         if(wait > 0):
             wait -= 1
         elif running_process is None: #need to set a running process
             if not ready_q.is_empty(): #if there are processes in the ready Q
                 wait = 3
-                RRinfo.turnaround_time += 4
+                RRinfo.turnaround_time += 4 #fix this???
                 running_process = ready_q.pop()
-                print_started_using_cpu(clock + 4, running_process, ready_q)
+                addtocpu = True
+                #print_started_using_cpu(clock + 4, running_process, ready_q)
                 timeslice_counter = 0
         else: #there is a running_process
             if(running_process.current_burst <= 0): #running process has finished bursts
@@ -270,6 +291,10 @@ def RR(process_list):
                     RRinfo.turnaround_time += 4
                     running_process.io_burst += 3 #to add for the wait time
                     blocked.append(running_process)
+
+                    #add_to_blocked = running_process
+
+
                     timeslice_counter = 0
                 else:
                     print_process_terminated(clock, running_process, ready_q)
@@ -303,18 +328,27 @@ def RR(process_list):
         RRinfo.wait_time += int(ready_q.length())
         RRinfo.turnaround_time += int(ready_q.length()) #count for all processes in queue
 
+        ###
+        #blockedaddpart==true
+        #....
+
         #handle blocked list
         i = 0
         while i < len(blocked): #looping through blocks
             if blocked[i].io_burst <= 0: #if I/O is done
                 change_process = blocked.pop(i)
-                print_completed_io(clock + 1, change_process, ready_q)
                 ready_q.push(change_process)
+                print_completed_io(clock + 1, change_process, ready_q)
+                #print_completed_io(clock, change_process, ready_q)
                 continue
             else: #if I/O burst needs more time
                 blocked[i].io_burst -= 1
             i += 1
         clock += 1
+
+        #if(add_to_blocked is not None):
+            #blocked.append(add_to_blocked)
+            #add_to_blocked = None
 
     clock += wait
     print_simulator_finish(clock, algo, ready_q)
@@ -352,7 +386,7 @@ if __name__ == "__main__":
     SRT(process_listSRT)
     print()
     RR(process_listRR)
-    
+
     # #adding the info to the output text file
     # print(str(FCFSinfo))
     # print(str(SRTinfo))

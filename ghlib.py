@@ -109,6 +109,18 @@ class Priority_Queue(Queue):
     def __init__(self):
         Queue.__init__(self)
 
+    def __str__(self):
+        r = "[Q "
+        count = 0
+        for i in sorted(self.q_list):
+            r = r + i.id + " "*(count < len(self.q_list) - 1)
+            count += 1
+        if self.is_empty():
+            r = r + "<empty>]"
+        else:
+            r = r + "]"
+        return r
+
     '''
     parameters: val <the value being added to the priority queue
     purpose: adds value to the end of q_list and the function
