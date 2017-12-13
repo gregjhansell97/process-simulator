@@ -14,7 +14,7 @@ class FirstFit(ContMem):
 	def add(self, Process):
 		length = Process.size
 		letter = str(Process)
-		i = 0	
+		i = 0
 		while(i < self.num_frames):
 			i = self.find_process('.', i)
 
@@ -29,7 +29,7 @@ class FirstFit(ContMem):
 				if (self.mem_list[i+j] != '.'):
 					i += j
 					break
-	
+
 			if (intheclear):
 				#print("locationtoadd: ", i)
 				break

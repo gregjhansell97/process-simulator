@@ -45,6 +45,9 @@ class Process(object):
     def isDone(time):
         return time == end
 
+    def shouldStart(time):
+        return time == start
+
     #Parameters
     #time:
     #amount:
