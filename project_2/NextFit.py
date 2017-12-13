@@ -1,10 +1,13 @@
 from ContMem import *
+from process import *
 
 class NextFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
 
-	def add(self, letter, length):
+	def add(self, Process):
+		length = Process.size
+		letter = str(Process)
 		i = 0	
 		while(i < self.num_frames):
 			i = self.find_process('.', i)

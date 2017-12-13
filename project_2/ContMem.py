@@ -2,6 +2,8 @@
 #Variables:
 #num_frames: number of frames in memory
 
+from process import *
+
 class ContMem(object):
 	#Parameters
 	#num_framesI: 
@@ -33,20 +35,20 @@ class ContMem(object):
 	#letter: the letter of the process
 	#
 	#Return: returns the location in memory after start that has letter
-	def find_process(self, letter, start):
+	def find_process(self, Process, start):
 		i = start
 		while (i < self.num_frames):
-			if (self.mem_list[i] == str(letter)):
+			if (self.mem_list[i] == str(Process)):
 				break
 			i += 1
 		return i
 
-	def remove(self, letter):
-		start_point = self.find_process(letter, 0)
+	def remove(self, Process):
+		start_point = self.find_process(Process, 0)
 
 		i = start_point
 		while (i < self.num_frames):
-			if (self.mem_list[i] != letter or self.mem_list[i] == '.'):
+			if (self.mem_list[i] != str(Process) or self.mem_list[i] == '.'):
 				break
 			self.mem_list[i] = '.'
 			i += 1
