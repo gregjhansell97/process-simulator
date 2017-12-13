@@ -1,9 +1,9 @@
 from ContMem import *
 from process import *
 
-#NextFit:
+#FirstFit:
 #builds on the ContMem class
-class NextFit(ContMem):
+class FirstFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
 
@@ -14,14 +14,9 @@ class NextFit(ContMem):
 	def add(self, Process):
 		length = Process.size
 		letter = str(Process)
-		i = self.current_frame	
+		i = 0	
 		while(i < self.num_frames):
 			i = self.find_process('.', i)
-
-			#if nextfit gets to end, goes back to beginning and looks again
-			if (i == self.num_frames-1):
-				i = 0
-				continue
 
 			j = 0
 			intheclear = False
@@ -44,6 +39,3 @@ class NextFit(ContMem):
 			#print("i: ", i)
 			self.mem_list[i] = str(letter)
 			i += 1
-
-		#setting the starting location for the next add
-		self.current_frame = i

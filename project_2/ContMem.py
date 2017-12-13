@@ -60,6 +60,21 @@ class ContMem(object):
 			self.mem_list[i] = '.'
 			i += 1
 
+	#Parameters:
+	#
+	#Return: the number of total frames that are free. helpful to know before defragging
+	def check_total_free(self):
+		i = 0
+		total_free = 0
+		while (i < self.num_frames):
+			if (self.mem_list[i] == '.'):
+				total_free += 1
+			i += 1
+		return total_free
+
+	#Parameters:
+	#
+	#Return: total number of frames moved. returns 0 if no moving needed
 	def move(self):
 		#seeing if a move needs to happen
 		i = 0
@@ -94,6 +109,10 @@ class ContMem(object):
 				break
 		return count
 
+	#Parameters:
+	#
+	#Return: handles the defragging and returns the total number of moves occured.
+	#		if no moves occurred, 0 is returned
 	def defrag(self):
 		total_count = 0
 		while (1):
@@ -102,6 +121,9 @@ class ContMem(object):
 				total_count += count
 			else:
 				break 
+
+		#reset the current frame
+		self.current_frame = self.find_process('.', 0)
 
 		return total_count
 
