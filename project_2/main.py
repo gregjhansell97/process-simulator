@@ -25,4 +25,7 @@ if __name__ == "__main__":
 	print(testProc)
 	testProc.add(processes[3])
 	print(testProc)
+	num_delay = testProc.defrag()
+	print(testProc)
+	print("num_delay: ", num_delay)
 

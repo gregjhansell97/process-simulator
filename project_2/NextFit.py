@@ -1,10 +1,16 @@
 from ContMem import *
 from process import *
 
+#NextFit:
+#builds on the ContMem class
 class NextFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
 
+	#Parameters:
+	#process: the process to be added
+	#
+	#Return: NA
 	def add(self, Process):
 		length = Process.size
 		letter = str(Process)
