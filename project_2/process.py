@@ -42,19 +42,24 @@ class Process(object):
     #time:
     #
     #Return
-    def isDone(time):
-        return time == end
+    def isDone(self, time):
+        return time == self.end
 
-    def shouldStart(time):
-        return time == start
+    def shouldStart(self, time):
+        return time == self.start
 
     #Parameters
     #time:
     #amount:
     #
     #Return
-    def shiftTime(time, amount):
-        pass
+    def shiftTime(self, time, amount):
+        if time <= self.start:
+            self.start += amount
+        if time <= self.end:
+            self.end += amount
+
+
 
 
 def parse_process_file(file_name):

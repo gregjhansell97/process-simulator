@@ -50,26 +50,28 @@ class ContMem(object):
 	#process: the process to be removed
 	#
 	#Return: NA
-	def remove(self, Process):
-		start_point = self.find_process(Process, 0)
+	def remove(self, p):
+		letter = p.letter
+		for i in range(len(self.mem_list)):
+			if self.mem_list[i] == letter:
+				self.mem_list[i] = '.'
+		'''start_point = self.find_process(Process, 0)
 
 		i = start_point
 		while (i < self.num_frames):
 			if (self.mem_list[i] != str(Process) or self.mem_list[i] == '.'):
 				break
 			self.mem_list[i] = '.'
-			i += 1
+			i += 1'''
 
 	#Parameters:
 	#
 	#Return: the number of total frames that are free. helpful to know before defragging
-	def check_total_free(self):
-		i = 0
+	def get_total_free_frames(self):
 		total_free = 0
-		while (i < self.num_frames):
-			if (self.mem_list[i] == '.'):
+		for frame in self.mem_list:
+			if frame == '.':
 				total_free += 1
-			i += 1
 		return total_free
 
 	#Parameters:
@@ -83,7 +85,7 @@ class ContMem(object):
 			if (self.mem_list[i] == '.'):
 				first_dot = i
 				break
-			i += 1	
+			i += 1
 
 		first_letter = 0
 		while (i < self.num_frames):
@@ -120,10 +122,9 @@ class ContMem(object):
 			if (count > 0):
 				total_count += count
 			else:
-				break 
+				break
 
 		#reset the current frame
 		self.current_frame = self.find_process('.', 0)
 
 		return total_count
-

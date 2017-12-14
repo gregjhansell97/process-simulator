@@ -11,51 +11,64 @@ def time_str(time):
 
 def run_sim(memory, processes):
     time = 0
-    print(time_str(time) + "Simulator started " + str(memory))
+    print(time_str(time) + "Simulator started ")# we need some way to get simulator started
     while len(processes) > 0:
         i = 0
-        #endles removals first
+        #removals first
         while i < len(processes):
             p = processes[i];
             if p.isDone(time):
                 memory.remove(p) #remove from memory
                 del processes[i]
+                print(time_str(time))
+                print(memory)
                 continue
+            i += 1
         for p in processes:
             if p.shouldStart(time):
-                #needs to deal with memory defragmentaiton
+                if p.size > memory.get_total_free_frames(): #skip, there's not enough room
+                    continue
+                if memory.defragNeeded(p):
+                    time_shift = memory.defrag()
+                    for p_edit in processes:
+                        p_edit.shiftTime(time, time_shift)
+                    #needs to handle time shift
                 memory.add(p)
-
+                print(time_str(time))
+                print(memory)
+        time += 1
 
 def first_fit_test():
-	testProc = FirstFit(256)
-	print(testProc)
+    testProc = FirstFit(256)
+    print(testProc)
 
-	testProc.add(processes[0])
-	print(testProc)
+    testProc.add(processes[0])
+    print(testProc)
 
-	testProc.add(processes[1])
-	print(testProc)
+    testProc.add(processes[1])
+    print(testProc)
 
-	testProc.remove('A')
-	print(testProc)
+    testProc.remove(processes[0])
+    print(testProc)
 
-	testProc.add(processes[3])
-	print(testProc)
+    testProc.add(processes[3])
+    print(testProc)
 
-	num_delay = testProc.defrag()
-	print(testProc)
-	print("num_delay: ", num_delay)
+    num_delay = testProc.defrag()
+    print(testProc)
+    print("num_delay: ", num_delay)
 
-	testProc.add(processes[1])
-	print(testProc)
+    testProc.add(processes[1])
+    print(testProc)
 
-	testProc.remove('D')
-	print(testProc)
+    testProc.remove('D')
+    print(testProc)
 
-	num_delay = testProc.defrag()
-	print(testProc)
-	print("num_delay: ", num_delay)
+    num_delay = testProc.defrag()
+    print(testProc)
+    print("num_delay: ", num_delay)
+
+
 
 def best_fit_test():
     testProc = BestFit(256)
@@ -82,9 +95,10 @@ def best_fit_test():
     print(testProc)
 
 if __name__ == "__main__":
-	processes = parse_process_file(sys.argv[1])
-	for l in processes:
-		print(l)
+    processes = parse_process_file(sys.argv[1])
 
-	#first_fit_test()
-	best_fit_test()
+    testProc = FirstFit(256)
+    #print(testProc)
+    run_sim(testProc, processes)
+    #first_fit_test()
+    #best_fit_test()

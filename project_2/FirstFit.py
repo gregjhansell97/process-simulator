@@ -7,6 +7,19 @@ class FirstFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
 
+
+	def defragNeeded(self, p):
+		free_frame_count = 0 #counts the number of free frames in a row
+		for frame in self.mem_list:#iterates throught he frames of memory
+			if frame == '.': #'.' signifies and empty frame
+				free_frame_count += 1
+			else:
+				free_frame_count = 0
+			if free_frame_count >= p.size:
+				return False
+		return True
+
+
 	#Parameters:
 	#process: the process to be added
 	#
