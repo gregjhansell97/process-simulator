@@ -27,11 +27,16 @@ def run_sim(memory, processes):
         for p in processes:
             if p.shouldStart(time):
                 if p.size > memory.get_total_free_frames(): #skip, there's not enough room
+                    print(time_str(time))
+                    print(memory)
                     continue
                 if memory.defragNeeded(p):
                     time_shift = memory.defrag()
                     for p_edit in processes:
                         p_edit.shiftTime(time, time_shift)
+                    print(time_str(time))
+                    print(memory)
+                    break
                     #needs to handle time shift
                 memory.add(p)
                 print(time_str(time))
