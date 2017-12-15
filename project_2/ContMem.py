@@ -7,6 +7,7 @@ from process import *
 #t_memmove: for defragging. the time it takes to move one frame
 #mem_list: the actual memory as a list
 #current_frame: important for algorithms that keep track of order when adding processes
+#mem-type: for printing in main
 class ContMem(object):
 	#Parameters
 	#num_framesI: the number of frames to be allocated for memory
@@ -135,6 +136,9 @@ class ContMem(object):
 
 		return (total_count, defrag_set)
 
+	#Parameters:
+	#process: the process that will be checked for defragging
+	#Return: a boolean as to whether or not we can add the process without defragging
 	def defrag_needed(self, p):
 		free_frame_count = 0 #counts the number of free frames in a row
 		for frame in self.mem_list:#iterates throught he frames of memory

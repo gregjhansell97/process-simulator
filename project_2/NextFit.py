@@ -3,6 +3,8 @@ from process import *
 
 #NextFit:
 #builds on the ContMem class
+#Variables:
+#algo-type: for printing in main
 class NextFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
@@ -50,7 +52,7 @@ class NextFit(ContMem):
 			self.mem_list[i] = str(letter)
 			i += 1
 
-		#setting the starting location for the next add
+		#setting the starting location for the next add. accounts for if add goes to end of memory
 		if (i == 256):
 			self.current_frame = 0
 		else:

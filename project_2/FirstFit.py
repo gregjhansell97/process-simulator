@@ -3,6 +3,8 @@ from process import *
 
 #FirstFit:
 #builds on the ContMem class
+#Variables:
+#algo-type: for printing in main
 class FirstFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)

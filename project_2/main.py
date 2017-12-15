@@ -6,6 +6,7 @@ from process import *
 from NextFit import *
 from FirstFit import *
 from BestFit import *
+from NonContMem import *
 
 def time_str(time):
 	return "time " + str(time) + "ms: "
