@@ -33,7 +33,7 @@ class BestFit(ContMem):
 		i = 0
 		list_of_potentials = []
 		while (i < self.num_frames):
-			i = self.find_p('.', i)
+			i = self.find_process('.', i)
 			count = self.check_for_letter(i, p.size)
 			if (count >= p.size):
 				list_of_potentials.append([i, count])

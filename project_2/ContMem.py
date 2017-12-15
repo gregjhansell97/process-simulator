@@ -40,10 +40,10 @@ class ContMem(object):
 	#letter: the letter of the process
 	#
 	#Return: returns the location in memory after start that has letter
-	def find_process(self, Process, start):
+	def find_process(self, p, start):
 		i = start
 		while (i < self.num_frames):
-			if (self.mem_list[i] == str(Process)):
+			if (self.mem_list[i] == str(p)):
 				break
 			i += 1
 		return i

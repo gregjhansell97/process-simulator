@@ -42,7 +42,9 @@ def run_sim(memory, processes):
         #removals first
         while i < len(processes):
             p = processes[i]
-            #TODO: make bool that keeps track if process is in memory
+            if (p.is_past(time)):
+            	del processes[i]
+            	continue
             if (p.is_done(time) and p.in_memory):
                 memory.remove(p) #remove from memory
                 del processes[i]

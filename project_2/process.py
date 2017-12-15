@@ -46,6 +46,9 @@ class Process(object):
     def is_done(self, time):
         return time == self.end
 
+    def is_past(self, time):
+        return time > self.end
+
     def should_start(self, time):
         return time == self.start
 

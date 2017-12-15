@@ -16,13 +16,16 @@ class NextFit(ContMem):
 		length = p.size
 		letter = str(p)
 		i = self.current_frame
-		#print("self.current_frame1: ", self.current_frame)	
+		print("self.current_frame1: ", self.current_frame)	
 		while(i < self.num_frames):
 			i = self.find_process('.', i)
 
+			print("i: ", i)
+
 			#if nextfit gets to end, goes back to beginning and looks again
-			if (i == self.num_frames-1):
+			if (i == (self.num_frames)-1 or i == (self.num_frames)):
 				i = 0
+				print("ay")
 				continue
 
 			j = 0
@@ -54,4 +57,4 @@ class NextFit(ContMem):
 			self.current_frame = i
 
 		p.in_memory = True
-		#print("self.current_frame2: ", self.current_frame)	
+		print("self.current_frame2: ", self.current_frame)	
