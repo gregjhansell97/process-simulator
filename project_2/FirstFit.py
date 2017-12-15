@@ -6,27 +6,15 @@ from process import *
 class FirstFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
-
-
-	def defragNeeded(self, p):
-		free_frame_count = 0 #counts the number of free frames in a row
-		for frame in self.mem_list:#iterates throught he frames of memory
-			if frame == '.': #'.' signifies and empty frame
-				free_frame_count += 1
-			else:
-				free_frame_count = 0
-			if free_frame_count >= p.size:
-				return False
-		return True
-
+		self.algo_type = "First-Fit"
 
 	#Parameters:
 	#process: the process to be added
 	#
 	#Return: NA
-	def add(self, Process):
-		length = Process.size
-		letter = str(Process)
+	def add(self, p):
+		length = p.size
+		letter = str(p)
 		i = 0
 		while(i < self.num_frames):
 			i = self.find_process('.', i)
@@ -52,3 +40,5 @@ class FirstFit(ContMem):
 			#print("i: ", i)
 			self.mem_list[i] = str(letter)
 			i += 1
+
+		p.in_memory = True

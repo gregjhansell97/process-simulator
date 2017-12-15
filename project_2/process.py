@@ -17,6 +17,7 @@ class Process(object):
         self.size = size
         self.end = start + length
         self.letter = letter
+        self.in_memory = False
 
     #overriden system functions (used for sorting and printing/casting)
     def __str__(self):
@@ -42,10 +43,10 @@ class Process(object):
     #time:
     #
     #Return
-    def isDone(self, time):
+    def is_done(self, time):
         return time == self.end
 
-    def shouldStart(self, time):
+    def should_start(self, time):
         return time == self.start
 
     #Parameters
@@ -53,7 +54,7 @@ class Process(object):
     #amount:
     #
     #Return
-    def shiftTime(self, time, amount):
+    def shift_time(self, time, amount):
         if time <= self.start:
             self.start += amount
         if time <= self.end:

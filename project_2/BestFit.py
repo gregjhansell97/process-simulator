@@ -6,6 +6,7 @@ from process import *
 class BestFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
+		self.algo_type = "Best-Fit"
 
 	#Parameters:
 	#pointer: the beginning of a chunk of free memory
@@ -27,21 +28,21 @@ class BestFit(ContMem):
 	#process: the process to be added
 	#
 	#Return: NA
-	def add(self, Process):
-		#find list of all potential landing spots bigger than the lenght of the process
+	def add(self, p):
+		#find list of all potential landing spots bigger than the lenght of the p
 		i = 0
 		list_of_potentials = []
 		while (i < self.num_frames):
-			i = self.find_process('.', i)
-			count = self.check_for_letter(i, Process.size)
-			if (count >= Process.size):
+			i = self.find_p('.', i)
+			count = self.check_for_letter(i, p.size)
+			if (count >= p.size):
 				list_of_potentials.append([i, count])
 			i += count
 			i += 1
 
 		#print("list_of_potentials: ", list_of_potentials)
 
-		#get the spot where the process will be added
+		#get the spot where the p will be added
 		i = 0
 		min_num = 65536
 		min_spot = 0
@@ -52,8 +53,10 @@ class BestFit(ContMem):
 			i += 1
 		spot_to_add = list_of_potentials[min_spot][0]
 
-		#add process to memory
+		#add p to memory
 		i = spot_to_add
-		while (i < spot_to_add+Process.size):
-			self.mem_list[i] = str(Process)
+		while (i < spot_to_add+p.size):
+			self.mem_list[i] = str(p)
 			i += 1
+
+		p.in_memory = True

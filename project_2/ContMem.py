@@ -18,6 +18,8 @@ class ContMem(object):
 		self.mem_list = []
 		self.current_frame = 0
 
+		self.mem_type = "Contiguous"
+
 		i = 0
 		while (i < self.num_frames):
 			self.mem_list.append('.')
@@ -55,6 +57,8 @@ class ContMem(object):
 		for i in range(len(self.mem_list)):
 			if self.mem_list[i] == letter:
 				self.mem_list[i] = '.'
+
+		p.in_memory = False
 		'''start_point = self.find_process(Process, 0)
 
 		i = start_point
@@ -77,7 +81,7 @@ class ContMem(object):
 	#Parameters:
 	#
 	#Return: total number of frames moved. returns 0 if no moving needed
-	def move(self):
+	def move(self, defrag_set):
 		#seeing if a move needs to happen
 		i = 0
 		first_dot = 0
@@ -102,6 +106,7 @@ class ContMem(object):
 		count = 0
 		while (1):
 			if (self.mem_list[first_letter] == letter):
+				defrag_set.add(self.mem_list[first_letter])
 				self.mem_list[first_dot] = letter
 				self.mem_list[first_letter] = '.'
 				first_dot += 1
@@ -116,9 +121,10 @@ class ContMem(object):
 	#Return: handles the defragging and returns the total number of moves occured.
 	#		if no moves occurred, 0 is returned
 	def defrag(self):
+		defrag_set = set()
 		total_count = 0
 		while (1):
-			count = self.move()
+			count = self.move(defrag_set)
 			if (count > 0):
 				total_count += count
 			else:
@@ -127,4 +133,15 @@ class ContMem(object):
 		#reset the current frame
 		self.current_frame = self.find_process('.', 0)
 
-		return total_count
+		return (total_count, defrag_set)
+
+	def defrag_needed(self, p):
+		free_frame_count = 0 #counts the number of free frames in a row
+		for frame in self.mem_list:#iterates throught he frames of memory
+			if frame == '.': #'.' signifies and empty frame
+				free_frame_count += 1
+			else:
+				free_frame_count = 0
+			if free_frame_count >= p.size:
+				return False
+		return True
