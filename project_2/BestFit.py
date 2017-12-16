@@ -8,7 +8,7 @@ from process import *
 class BestFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
-		self.algo_type = "Best-Fit"
+		self.algo_type = " -- Best-Fit"
 
 	#Parameters:
 	#pointer: the beginning of a chunk of free memory

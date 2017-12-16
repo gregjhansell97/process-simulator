@@ -27,14 +27,15 @@ class ContMem(object):
 			i += 1
 
 	def __str__(self):
-		returnStr = "================"
+		returnStr = "="*32
 		i = 0
 		while (i < self.num_frames):
-			if (i%16 == 0):
+			if (i%32 == 0):
 				returnStr += "\n"
 			returnStr += self.mem_list[i]
 			i += 1
-		returnStr += "\n================"
+		returnStr += "\n"
+		returnStr += "="*32
 		return returnStr
 
 	#Parameters:
@@ -60,14 +61,6 @@ class ContMem(object):
 				self.mem_list[i] = '.'
 
 		p.in_memory = False
-		'''start_point = self.find_process(Process, 0)
-
-		i = start_point
-		while (i < self.num_frames):
-			if (self.mem_list[i] != str(Process) or self.mem_list[i] == '.'):
-				break
-			self.mem_list[i] = '.'
-			i += 1'''
 
 	#Parameters:
 	#

@@ -13,6 +13,7 @@ class Process(object):
     #start: when the process starts needing the memory (given clock time)
     #length: how long the process needs the memory for
     def __init__(self, letter, size, start, length):
+        self.arrived = True
         self.start = start
         self.size = size
         self.end = start + length
@@ -70,7 +71,23 @@ def parse_process_file(file_name):
     f = open(file_name)
     processes = list()
     for line in f:
-        split_spaced = line.split(" ")
+        if len(line) <= 4:
+            continue
+        if line[0] == "#" or line[0] == " " or line[0] == "\t":
+            continue
+
+        buff = ""
+        split_spaced = list()
+        for c in line:
+            if c == " " or c == "\t":
+                if len(buff) > 0:
+                    split_spaced.append(buff)
+                    buff = ""
+                continue
+            buff += c
+        if buff != "":
+            split_spaced.append(buff)
+        #split_spaced = line.split(" ")
         letter = split_spaced[0]
         del(split_spaced[0])
         size = int(split_spaced[0])

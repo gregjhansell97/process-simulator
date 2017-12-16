@@ -8,7 +8,7 @@ from process import *
 class FirstFit(ContMem):
 	def __init__(self, num_framesI):
 		ContMem.__init__(self, num_framesI)
-		self.algo_type = "First-Fit"
+		self.algo_type = " -- First-Fit"
 
 	#Parameters:
 	#process: the process to be added

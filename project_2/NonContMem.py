@@ -1,4 +1,5 @@
 from process import *
+import collections
 
 #This class describes the attributes of a non-contiguous memory class
 #Variables:
@@ -15,44 +16,43 @@ class NonContMem(object):
 	def __init__(self, num_framesI):
 		self.num_frames = num_framesI
 		self.max_num_processes = 26
-		self.t_memmove = 1
 
 		self.mem_list = []
-		self.current_frame = 0
+		self.page_table = dict()
 
 		self.mem_type = "Non-contiguous"
 		self.algo_type = ""
 
-		i = 0
-		while (i < self.num_frames):
+		for i in range(self.num_frames):
 			self.mem_list.append('.')
-			i += 1
 
 	def __str__(self):
-		returnStr = "================"
+		returnStr = "="*32
 		i = 0
 		while (i < self.num_frames):
-			if (i%16 == 0):
+			if (i%32 == 0):
 				returnStr += "\n"
 			returnStr += self.mem_list[i]
 			i += 1
-		returnStr += "\n================"
-
-		#also add onto return string page count
-
+		returnStr += "\n"
+		returnStr += "="*32
+		returnStr += "\nPAGE TABLE [page,frame]:"
+		for k in sorted(self.page_table.keys()):
+			returnStr += "\n" + k + ":"
+			for index in range(len(self.page_table[k])):
+				l = self.page_table[k][index]
+				if index%10 == 0 and index != 0:
+					returnStr += "\n"
+				else:
+					returnStr += " "
+				returnStr += "[" + str(l[0]) + "," + str(l[1]) + "]"
 		return returnStr
 
-	#Parameters:
-	#letter: the letter of the process
-	#
-	#Return: returns the location in memory after start that has letter
-	def find_process(self, p, start):
-		i = start
-		while (i < self.num_frames):
-			if (self.mem_list[i] == str(p)):
-				break
-			i += 1
-		return i
+	def defrag_needed(self, p):
+		return False
+
+	def defrag(self):
+		print("WARNING: SHOULD NEVER BE CALLED")
 
 	#Parameters:
 	#process: the process to be removed
@@ -63,7 +63,7 @@ class NonContMem(object):
 		for i in range(len(self.mem_list)):
 			if self.mem_list[i] == letter:
 				self.mem_list[i] = '.'
-
+		self.page_table.pop(letter, None)
 		p.in_memory = False
 
 	#Parameters:
@@ -77,5 +77,13 @@ class NonContMem(object):
 		return total_free
 
 	def add(self, p):
-		pass
-		#make add here. biggest part of noncontig
+		p.in_memory = True
+		frame_number = 0
+		self.page_table[p.letter] = list()
+		for i in range(len(self.mem_list)):
+			if frame_number >= p.size:
+				break
+			if self.mem_list[i] == '.':
+				self.mem_list[i] = p.letter
+				self.page_table[p.letter].append([frame_number, i])
+				frame_number += 1
